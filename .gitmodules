@@ -1,4 +1,4 @@
 [submodule "DENSE"]
 	path = DENSE
 	url = https://github.com/johnastratton/DENSE.git
-	branch = dev
+	branch = cell_growth_submodule
