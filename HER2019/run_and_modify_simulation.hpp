@@ -76,7 +76,7 @@ void run_and_modify_simulation(
   std::chrono::duration<Real, std::chrono::minutes::period> notify_interval,
   std::vector<Simulation> simulations,
   std::vector<std::pair<std::string, std::unique_ptr<Analysis<Simulation>>>> analysis_entries){
-
+  
   struct Callback {
     Callback(
     std::unique_ptr<Analysis<Simulation>> analysis,
@@ -100,7 +100,7 @@ void run_and_modify_simulation(
   };
   
   std::vector<Callback> callbacks;
-  
+    
       // If multiple sets, set file name to "x_####.y"
   int mt = 0;
   for (std::size_t i = 0; i < simulations.size(); ++i) {
@@ -122,6 +122,8 @@ void run_and_modify_simulation(
       callback.analysis->show_cells();
     }
   }
+  
+  cell_growth<Simulation, Callback> cg(&simulations, &mutants, width, &callbacks);
 
   // End all observer preparation
   // ========================= RUN THE SHOW =========================
@@ -132,12 +134,7 @@ void run_and_modify_simulation(
   for (dense::Natural a = 0; a < analysis_chunks; a++) {
       //handle cell growth
       if(a % notifications_per_min == 0 && a != 0){
-        for(auto& simulation : simulations){
-            grow_cells(&simulation);
-            for (auto& callback : callbacks) { //update the analysis objects
-              callback.analysis->update_cell_range(0, simulation.cell_count(), simulation.physical_cells_id());
-            }
-        }
+        cg.grow_cells();
       }
     
       std::vector<Simulation const*> bad_simulations;

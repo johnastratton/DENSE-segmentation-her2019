@@ -57,8 +57,13 @@ int main(int argc, char* argv[]){
   if(args.help == 2){
     return EXIT_FAILURE;
   }
+  arg_parse::init(argc, argv);
+  int tissue_width;
+  int num_active_mutants = 0;
+  arg_parse::get<int>("w", "tissue-width", &tissue_width, false);
+  arg_parse::get<int>("nm", "num-mutants", &num_active_mutants, false);
+  
   int num_param_sets = args.param_sets.size();
-  int num_active_mutants = 10;
   mutant_data mtd(args.param_sets, num_active_mutants);
   
   using Simulation = Fast_Gillespie_Direct_Simulation;
@@ -67,7 +72,7 @@ int main(int argc, char* argv[]){
   std::vector<Parameter_Set> param_sets = mtd.get_sets(num_active_mutants);
   std::vector<Simulation> all_sims = sim.get_simulations(param_sets);
   
-//  dense::Natural width = args.
   
-  dense::run_and_modify_simulation<Simulation>(true, num_active_mutants, num_param_sets, mtd, args.simulation_duration, args.analysis_interval, std::move(all_sims), parse_analysis_entries<Simulation>(argc, argv, args.adj_graph.num_vertices()));
+  
+  dense::run_and_modify_simulation<Simulation>(true, tissue_width, num_param_sets, mtd, args.simulation_duration, args.analysis_interval, std::move(all_sims), parse_analysis_entries<Simulation>(argc, argv, args.adj_graph.num_vertices()));
 }
