@@ -9,11 +9,5 @@ std::string file_add_mutant(std::string file, mutant mt, int param_set){
   return file;
 }
 
-namespace dense{
-  
-
-  
-  
-}
 
 #endif
