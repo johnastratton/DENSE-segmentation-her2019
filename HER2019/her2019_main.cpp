@@ -38,7 +38,6 @@ using style::Color;
 using dense::csvw_sim;
 using dense::Deterministic_Simulation;
 using dense::Fast_Gillespie_Direct_Simulation;
-using dense::stochastic::Next_Reaction_Simulation;
 using dense::Sim_Builder;
 using dense::parse_static_args;
 using dense::parse_analysis_entries;
@@ -58,15 +57,17 @@ int main(int argc, char* argv[]){
   if(args.help == 2){
     return EXIT_FAILURE;
   }
-  
-  int num_active_mutants = 11;
+  int num_param_sets = args.param_sets.size();
+  int num_active_mutants = 10;
   mutant_data mtd(args.param_sets, num_active_mutants);
   
   using Simulation = Fast_Gillespie_Direct_Simulation;
   Sim_Builder<Simulation> sim = Sim_Builder<Simulation>(args.perturbation_factors, args.gradient_factors, args.adj_graph, ac, av);
 
   std::vector<Parameter_Set> param_sets = mtd.get_sets(num_active_mutants);
+  std::vector<Simulation> all_sims = sim.get_simulations(param_sets);
   
-  dense::run_and_modify_simulation<Simulation>(true, Minutes(3), args.simulation_duration, args.analysis_interval, std::move(sim.get_simulations(param_sets)), 
-                                               parse_analysis_entries<Simulation>(argc, argv, args.adj_graph.num_vertices()));
+//  dense::Natural width = args.
+  
+  dense::run_and_modify_simulation<Simulation>(true, num_active_mutants, num_param_sets, mtd, args.simulation_duration, args.analysis_interval, std::move(all_sims), parse_analysis_entries<Simulation>(argc, argv, args.adj_graph.num_vertices()));
 }

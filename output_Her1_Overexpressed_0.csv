@@ -1,0 +1,36 @@
+
+# This file can be used as a template for user-created/modified analysis inputs in the context of this particular model for these particular command-line arguments.
+# The row after next MUST remain in the file in order for it to be parsable by the CSV reader. They indicate the following:
+cell-total, time-start, time-col, cell-start, cell-end, specie-option,
+16,0,1,0,16,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+
+Time,Cell,ph1,ph7,ph13,pd,mh1,mh7,mh13,md,ph11,ph17,ph113,ph77,ph1313,ph713,
+Time: 0,Cell: 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+,Cell: 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+,Cell: 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+,Cell: 3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+,Cell: 4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+,Cell: 5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+,Cell: 6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+,Cell: 7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+,Cell: 8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+,Cell: 9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+,Cell: 10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+,Cell: 11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+,Cell: 12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+,Cell: 13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+,Cell: 14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+,Cell: 15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+
+Time: 1.00001,Cell: 6,0,0,38,0,0,0,45,0,0,0,0,0,1,0,
+,Cell: 7,0,0,51,0,0,0,45,0,0,0,0,0,3,0,
+,Cell: 8,0,0,26,0,0,0,42,0,0,0,0,0,2,0,
+,Cell: 9,0,0,49,0,0,0,55,0,0,0,0,0,1,0,
+,Cell: 10,0,0,20,0,0,0,46,0,0,0,0,0,0,0,
+,Cell: 11,0,0,33,0,0,0,52,0,0,0,0,0,0,0,
+,Cell: 12,0,0,38,0,0,0,50,0,0,0,0,0,5,0,
+,Cell: 13,0,0,40,0,0,0,38,0,0,0,0,0,0,0,
+,Cell: 14,0,0,47,0,0,0,56,0,0,0,0,0,1,0,
+,Cell: 15,0,0,24,0,0,0,31,0,0,0,0,0,1,0,
+
+# Showing cells 0-10 until 1.00001 min

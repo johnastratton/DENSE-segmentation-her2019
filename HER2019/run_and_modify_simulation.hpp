@@ -15,6 +15,11 @@
 #include "run_simulation.hpp"
 #include "arg_parse.hpp"
 #include "parse_analysis_entries.hpp"
+#include "init_mutants.hpp"
+
+//include her2019 files
+#include "her2019_utility.hpp"
+#include "cell_growth.hpp"
 
 using style::Color;
 
@@ -49,7 +54,9 @@ template <Simulation_Concept Simulation>
 #endif
 void run_and_modify_simulation(
   bool show_cells,
-  std::chrono::duration<Real, std::chrono::minutes::period> time_to_split,
+  int width,
+  int num_param_sets,
+  mutant_data mutants,
   std::chrono::duration<Real, std::chrono::minutes::period> duration,
   std::chrono::duration<Real, std::chrono::minutes::period> notify_interval,
   std::vector<Simulation> simulations,
@@ -62,7 +69,9 @@ template <Simulation_Concept Simulation>
 #endif
 void run_and_modify_simulation(
   bool show_cells,
-  std::chrono::duration<Real, std::chrono::minutes::period> time_to_split,
+  int width,
+  int num_param_sets,
+  mutant_data mutants,
   std::chrono::duration<Real, std::chrono::minutes::period> duration,
   std::chrono::duration<Real, std::chrono::minutes::period> notify_interval,
   std::vector<Simulation> simulations,
@@ -89,15 +98,21 @@ void run_and_modify_simulation(
     csvw log;
 
   };
+  
   std::vector<Callback> callbacks;
+  
       // If multiple sets, set file name to "x_####.y"
+  int mt = 0;
   for (std::size_t i = 0; i < simulations.size(); ++i) {
+    if((i % num_param_sets == 0) && (i != 0)){
+      mt++;
+    }
     for (auto& name_and_analysis : analysis_entries) {
       auto& out_file = name_and_analysis.first;
       callbacks.emplace_back(
         std::unique_ptr<Analysis<Simulation>>(name_and_analysis.second->clone()),
         simulations[i],
-        out_file.empty() ? csvw(std::cout) : csvw(simulations.size() == 1 ? out_file : file_add_num(out_file, "_", '0', i, 4, ".")));
+        csvw(simulations.size() == 1 ? out_file : file_add_mutant(out_file, mutants[mt], i % num_param_sets)));
     }
   }
   
@@ -107,7 +122,7 @@ void run_and_modify_simulation(
       callback.analysis->show_cells();
     }
   }
-  
+
   // End all observer preparation
   // ========================= RUN THE SHOW =========================
 
@@ -115,49 +130,16 @@ void run_and_modify_simulation(
   int notifications_per_min = decltype(duration)(1.0) / notify_interval;
 
   for (dense::Natural a = 0; a < analysis_chunks; a++) {
-      if( a == (time_to_split / Minutes{1})){
-        for (auto& simulation : simulations){
-          simulation.add_cell(11);
-          simulation.add_edge(9,11);
-          simulation.remove_edge(0,9);
-          simulation.add_cell(13);
-          simulation.add_edge(11,13);
-          simulation.add_cell(18);
-          simulation.add_edge(18,13);
-          simulation.add_edge(18,0);
-          for (auto& callback : callbacks) {
-            callback.analysis->update_cell_range(0, simulation.cell_count(), simulation.physical_cells_id());
-          }
+      //handle cell growth
+      if(a % notifications_per_min == 0 && a != 0){
+        for(auto& simulation : simulations){
+            grow_cells(&simulation);
+            for (auto& callback : callbacks) { //update the analysis objects
+              callback.analysis->update_cell_range(0, simulation.cell_count(), simulation.physical_cells_id());
+            }
         }
       }
-      if( a == ((time_to_split / Minutes{1})+2)){
-        for (auto& simulation : simulations){
-          simulation.remove_cell(4);
-          simulation.add_edge(18,3);
-          simulation.add_edge(13,2);
-          simulation.add_edge(11,13);
-          simulation.add_edge(11,8);
-          simulation.remove_edge(0,1);
-          simulation.remove_edge(18,13);
-          simulation.add_cell(15);
-          simulation.add_cell(15,18);
-          simulation.add_cell(15,13);
-          for (auto& callback : callbacks) {
-            callback.analysis->update_cell_range(0, simulation.cell_count(), simulation.physical_cells_id());
-          }
-        }
-      }
-      if( a == ((time_to_split / Minutes{1})+3)){
-        for (auto& simulation : simulations){
-          simulation.remove_cell(5);
-          simulation.remove_cell(6);
-          simulation.remove_cell(7);
-          for (auto& callback : callbacks) {
-            callback.analysis->update_cell_range(0, simulation.cell_count(), simulation.physical_cells_id());
-          }
-        }
-      }
-      
+    
       std::vector<Simulation const*> bad_simulations;
       for (auto& callback : callbacks) {
         try {
@@ -178,12 +160,14 @@ void run_and_modify_simulation(
         swap(simulations[bad_simulation - simulations.data()], simulations.back());
         simulations.pop_back();
       }
-
+    
+      Minutes age;
+    
       for (auto & simulation : simulations) {
-        auto age = simulation.age_by(notify_interval);
-        if (a % notifications_per_min == 0) {
-            std::cout << "Time: " << age / Minutes{1} << '\n';
-        }
+        age = simulation.age_by(notify_interval);
+      }
+      if (a % notifications_per_min == 0) {
+          std::cout << "Time: " << age / Minutes{1} << '\n';
       }
   }
 
